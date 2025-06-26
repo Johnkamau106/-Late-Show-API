@@ -26,7 +26,13 @@ def create_app():
     app.register_blueprint(episode_bp)
     app.register_blueprint(appearance_bp)
 
+    @app.route('/')
+    def index():
+        return 'Welcome to the Late Show API!'
+    
 
-
+    
 
     return app
+
+app = create_app()

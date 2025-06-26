@@ -5,19 +5,26 @@ from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint('auth', __name__)
 
+@auth_bp.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([
+        {"id": u.id, "username": u.username} for u in users
+    ])
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = register.get_json()
+    data = request.get_json()
     username = data.get('username')
     password = data.get('password')
 
     if not username or not password:
         return jsonify({"error": "username and password required"}), 400
     
-    if user.query.filter_by(username=username).first():
+    if User.query.filter_by(username=username).first():
         return jsonify({"error": "username already exists"}), 409
     
-    user = user(username=username)
+    user = User(username=username)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
@@ -31,7 +38,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    user = user.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
 
     if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
